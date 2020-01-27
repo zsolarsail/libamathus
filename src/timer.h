@@ -1,3 +1,5 @@
+#pragma once
+/*
 MIT License
 
 Copyright (c) 2016 zsolarsail
@@ -19,3 +21,59 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+// Easy implementation of a timer for many small objects.
+
+#include <functional>
+
+#include "dllist.h"
+
+using namespace std;
+
+// ----------------------
+
+class Timers;
+
+class Timer {
+private:
+    friend class Timers;
+
+    dl_list le;
+    
+    bool once = false;
+    long dt = 0;
+    long period = 0;
+
+public:
+
+    typedef std::function< void() > on_timer_f;
+    
+    on_timer_f on_timer;
+
+
+    Timer() = default;
+    Timer(const Timer &) = delete;
+    void operator=(const Timer &) = delete;
+
+    ~Timer() { disable(); };
+    
+    void disable(void) { le.del(); };
+
+    void enable(long interval, bool _once=false);
+
+private:
+    void clk(long now);
+};
+
+
+// ----------------------
+
+void timer_once(long interval, Timer::on_timer_f f);
+
+// ----------------------
+
+void timer_init(void *ev_base, int interval_us=100000);
+
+// ----------------------
+

@@ -1,7 +1,7 @@
 
 AC_PREREQ([2.69])
 AC_INIT([libamathus],[0.1-0])
-AC_CONFIG_SRCDIR([src/core.cpp])
+AC_CONFIG_SRCDIR([src/amathus-ws.cpp])
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS([config.h])

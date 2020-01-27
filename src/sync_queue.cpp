@@ -1,8 +1,7 @@
-#pragma once
+/*
+MIT License
 
-/* MIT License
-
-Copyright (c) 2020 zsolarsail
+Copyright (c) 2016 zsolarsail
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -23,3 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "sync_queue.h"
+
+// ----------------------
+
+void base_sync_queue::terminate(void)
+{
+    unique_lock<decltype(mtx)> lck(mtx);
+    terminated = true;
+    notify(true);
+};
+
+// ----------------------
+
+void sync_queue_thread_pool::init_pool(base_sync_queue *sq, unsigned count)
+{
+    if(count == 0)
+	count = 1;
+
+    while(count--)
+	pool.push_back( new thread(
+	    [sq](void) { 
+		while(sq->process_queue());
+	    }) 
+	);
+};
+
+void sync_queue_thread_pool::wait_pool(void)
+{
+    for(auto &t: pool)
+	t->join();
+
+    pool.clear();
+};
+
+
+// ----------------------
